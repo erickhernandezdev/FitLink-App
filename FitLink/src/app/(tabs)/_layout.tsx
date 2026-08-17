@@ -11,7 +11,7 @@ function TabBarIcon(props: Readonly<{
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-const HistoryIcon = ({ color }: { color: string }) => <TabBarIcon name="history" color={color} />;
+const ExploreIcon = ({ color }: { color: string }) => <TabBarIcon name="search" color={color} />;
 const HomeIcon = ({ color }: { color: string }) => <TabBarIcon name="home" color={color} />;
 const UserIcon = ({ color }: { color: string }) => <TabBarIcon name="user" color={color} />;
 
@@ -34,10 +34,10 @@ const TabLayout: React.FC = () => {
         }}
       >
         <Tabs.Screen
-          name="history"
+          name="explore"
           options={{
-            title: "Historial",
-            tabBarIcon: HistoryIcon,
+            title: "Explorar",
+            tabBarIcon: ExploreIcon,
           }}
         />
         <Tabs.Screen

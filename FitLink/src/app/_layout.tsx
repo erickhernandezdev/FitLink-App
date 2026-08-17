@@ -1,5 +1,6 @@
-import { Stack } from 'expo-router';
-import React from 'react';
+import { Stack, useRouter, useSegments } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { supabase } from '../services/supabase';
 import { theme } from '../constants/theme';
 import { useFonts } from "expo-font";
 import {
@@ -28,18 +29,78 @@ const RootLayout: React.FC = () => {
 };
 
 const RootLayoutNav: React.FC = () => {
+  const router = useRouter();
+  const segments = useSegments();
+
+  const [session, setSession] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadSession = async () => {
+      const { data } = await supabase.auth.getSession();
+
+      setSession(data.session);
+      setLoading(false);
+    };
+
+    loadSession();
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  useEffect(() => {
+    if (loading) return;
+
+    const inAuthScreens =
+      segments[0] === 'login' ||
+      segments[0] === 'register';
+
+    const inPrivateScreens = segments[0] === '(tabs)';
+
+    if (!session && inPrivateScreens) {
+      router.replace('/login');
+    }
+
+    if (session && inAuthScreens) {
+      router.replace('/routines');
+    }
+  }, [session, loading, segments]);
+
+  if (loading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: theme.colors.background,
+        }}
+      >
+        <ActivityIndicator
+          size="large"
+          color={theme.colors.primary}
+        />
+      </View>
+    );
+  }
+
   return (
     <Stack
       screenOptions={{
         headerShown: false,
-        contentStyle: { backgroundColor: theme.colors.background }
+        contentStyle: {
+          backgroundColor: theme.colors.background,
+        },
       }}
     >
-      {/* Pantallas públicas */}
       <Stack.Screen name="login" />
       <Stack.Screen name="register" />
-
-      {/* Pantallas privadas dentro de tabs */}
       <Stack.Screen name="(tabs)" />
     </Stack>
   );

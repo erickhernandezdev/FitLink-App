@@ -1,23 +1,8 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import ProfileView from '../../components/views/ProfileView';
 
-const Profile: React.FC = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Este es el profile</Text>
-    </View>
-  );
+const ProfileScreen: React.FC = () => {
+  return <ProfileView />;
 };
 
-export default Profile;
-
-const styles = StyleSheet.create({
-  container: {
-    alignItems: 'center',
-    flex: 1,
-    justifyContent: 'center'
-  },
-  text: {
-    fontSize: 20
-  }
-});
+export default ProfileScreen;

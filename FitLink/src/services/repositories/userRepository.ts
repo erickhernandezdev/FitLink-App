@@ -8,7 +8,7 @@ export async function getAuthUser() {
 export async function getUserByAuthId(authId: string) {
   const { data, error } = await supabase
     .from('users')
-    .select('user_id, auth_id')
+    .select('user_id, auth_id, username, full_name')
     .eq('auth_id', authId)
     .single();
   

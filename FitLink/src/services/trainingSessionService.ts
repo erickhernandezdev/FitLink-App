@@ -39,13 +39,16 @@ export async function endSession(
       .single();
     if (!userRow) return false;
 
+    const now = new Date();
+
     const { data: session } = await supabase
       .from("training_sessions")
       .insert({
         user_id: userRow.user_id,
         routine_id: routineId,
         duration,
-        date: new Date().toISOString(),
+        date: now.toISOString().split("T")[0],
+        time: now.toTimeString().split(" ")[0],
       })
       .select()
       .single();

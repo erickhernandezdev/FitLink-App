@@ -3,6 +3,7 @@ import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { supabase } from "../services/supabase";
 import { getRoutinesByUserId } from "../services/repositories/routineRepository";
+import { getTrainingSessionsByUserId } from "../services/repositories/trainingSessionRepository";
 
 interface RoutineExercisePreview {
   exercise_id: number;
@@ -21,7 +22,11 @@ export interface Routine {
 
 export const useRoutinesContainer = () => {
   const router = useRouter();
+
   const [routines, setRoutines] = useState<Routine[]>([]);
+  const [recommendedRoutine, setRecommendedRoutine] =
+    useState<Routine | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -46,6 +51,7 @@ export const useRoutinesContainer = () => {
         data: { user },
         error: userError,
       } = await supabase.auth.getUser();
+
       if (userError || !user) {
         setLoading(false);
         return;
@@ -68,9 +74,93 @@ export const useRoutinesContainer = () => {
 
       if (error) {
         console.error(error);
-      } else {
-        setRoutines(data || []);
+        setRoutines([]);
+        setRecommendedRoutine(null);
+        return;
       }
+
+      const loadedRoutines = data || [];
+      setRoutines(loadedRoutines);
+
+      // Obtener historial de entrenamientos
+      const {
+        sessions,
+        error: sessionsError,
+      } = await getTrainingSessionsByUserId(users.user_id);
+
+      if (sessionsError) {
+        console.error(sessionsError);
+      }
+
+      // Como las sesiones ya vienen ordenadas de más reciente
+      // a más antigua, guardamos la primera sesión encontrada
+      // para cada rutina.
+      const lastTrainingByRoutine = new Map<number, string>();
+
+      (sessions || []).forEach((session) => {
+        if (!lastTrainingByRoutine.has(session.routine_id)) {
+          lastTrainingByRoutine.set(
+            session.routine_id,
+            `${session.date}T${session.time || "00:00:00"}`
+          );
+        }
+      });
+
+      // Elegir rutina recomendada
+      const recommendation = loadedRoutines.reduce<Routine | null>(
+        (recommended, routine) => {
+          if (!recommended) {
+            return routine;
+          }
+
+          const routineLastTraining = lastTrainingByRoutine.get(
+            routine.routine_id
+          );
+
+          const recommendedLastTraining = lastTrainingByRoutine.get(
+            recommended.routine_id
+          );
+
+          // Priorizar rutinas que nunca se han entrenado
+          if (!routineLastTraining && recommendedLastTraining) {
+            return routine;
+          }
+
+          if (routineLastTraining && !recommendedLastTraining) {
+            return recommended;
+          }
+
+          // Si ninguna se ha entrenado, elegir la de menor duración
+          if (!routineLastTraining && !recommendedLastTraining) {
+            return routine.estimated_time < recommended.estimated_time
+              ? routine
+              : recommended;
+          }
+
+          // Si ambas se han entrenado, elegir la que lleva más
+          // tiempo sin entrenarse
+          if (
+            routineLastTraining &&
+            recommendedLastTraining &&
+            routineLastTraining < recommendedLastTraining
+          ) {
+            return routine;
+          }
+
+          // Si empatan, elegir la de menor duración
+          if (
+            routineLastTraining === recommendedLastTraining &&
+            routine.estimated_time < recommended.estimated_time
+          ) {
+            return routine;
+          }
+
+          return recommended;
+        },
+        null
+      );
+
+      setRecommendedRoutine(recommendation);
     } catch (err) {
       console.error(err);
     } finally {
@@ -88,6 +178,7 @@ export const useRoutinesContainer = () => {
     router.push("/routines/add-routine");
   };
 
+  // Iniciar entrenamiento
   const navigateToQuickStart = (routineId: number) => {
     router.push({
       pathname: "/training/[id]",
@@ -97,6 +188,7 @@ export const useRoutinesContainer = () => {
 
   return {
     routines: filteredRoutines,
+    recommendedRoutine,
     loading,
     searchQuery,
     setSearchQuery,

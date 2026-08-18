@@ -1,11 +1,15 @@
 import React from 'react';
+import { useRouter } from 'expo-router';
 import { useRoutinesContainer } from '../../containers/RoutinesContainer';
 import { RoutinesList } from '../lists/RoutinesList';
 
 export const RoutinesView: React.FC = () => {
+  const router = useRouter();
+
   const {
     routines,
     loading,
+    recommendedRoutine,
     searchQuery,
     setSearchQuery,
     navigateToRoutine,
@@ -13,15 +17,21 @@ export const RoutinesView: React.FC = () => {
     navigateToQuickStart,
   } = useRoutinesContainer();
 
+  const navigateToExplore = () => {
+    router.push('/(tabs)/explore');
+  };
+
   return (
     <RoutinesList
       routines={routines}
       loading={loading}
+      recommendedRoutine={recommendedRoutine}
       searchQuery={searchQuery}
       onSearchChange={setSearchQuery}
       onRoutinePress={navigateToRoutine}
       onAddRoutine={navigateToAddRoutine}
       onQuickStart={navigateToQuickStart}
+      onExplore={navigateToExplore}
     />
   );
 };

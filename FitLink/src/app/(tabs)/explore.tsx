@@ -4,7 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 const Explore: React.FC = () => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Este es el historial de entrenamientos</Text>
+      <Text style={styles.text}>Proximamente</Text>
     </View>
   );
 };
@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center'
   },
   text: {
-    fontSize: 20
+    fontSize: 20,
+    color: '#939393'
   }
 });

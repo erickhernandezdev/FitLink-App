@@ -86,8 +86,8 @@ export const RoutineDetailContent: React.FC<RoutineDetailContentProps> = ({
       </View>
 
       <View style={styles.buttonsContainer}>
-        <Button title="Editar rutina" onPress={onEdit} />
-        <Button title="Eliminar rutina" onPress={onDelete} />
+        <Button title="Editar rutina" onPress={onEdit} variant="secondary" />
+        <Button title="Eliminar rutina" onPress={onDelete} variant="danger" />
       </View>
     </ScrollView>
   );

@@ -1,7 +1,16 @@
-import { View, TextInput, Switch, StyleSheet, Text,
-  KeyboardAvoidingView, Platform, ScrollView, Pressable } from 'react-native';
-import { Button } from '../ui/Button';
-import { theme } from '../../constants/theme';
+import {
+  View,
+  TextInput,
+  Switch,
+  StyleSheet,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  ScrollView,
+  Pressable,
+} from "react-native";
+import { Button } from "../ui/Button";
+import { theme } from "../../constants/theme";
 
 interface Exercise {
   exercise_id: number;
@@ -21,7 +30,7 @@ interface RoutineFormProps {
   exerciseSets: { [key: number]: string };
   isLoading?: boolean;
   submitLabel?: string;
-  
+
   setIsShared: (value: boolean) => void;
   setSearchQuery: (value: string) => void;
   handleNameChange: (text: string) => void;
@@ -45,7 +54,7 @@ export default function RoutineForm({
   selectedExercises,
   exerciseSets,
   isLoading = false,
-  submitLabel = 'Guardar rutina',
+  submitLabel = "Guardar rutina",
   setIsShared,
   setSearchQuery,
   handleNameChange,
@@ -59,64 +68,91 @@ export default function RoutineForm({
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 0}
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
-      <ScrollView 
+      <ScrollView
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
         <Text style={styles.label}>Nombre de la rutina</Text>
+
         <TextInput
           style={styles.input}
           placeholder="Nombre"
+          placeholderTextColor={theme.colors.textSecondary}
           value={name}
           onChangeText={handleNameChange}
         />
+
         {!!errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
 
         <Text style={styles.label}>Descripción de la rutina</Text>
+
         <TextInput
           style={[styles.input, styles.description]}
           placeholder="Descripción"
+          placeholderTextColor={theme.colors.textSecondary}
           value={description}
           onChangeText={handleDescriptionChange}
           multiline
         />
-        {!!errors.description && <Text style={styles.errorText}>{errors.description}</Text>}
+
+        {!!errors.description && (
+          <Text style={styles.errorText}>{errors.description}</Text>
+        )}
 
         <Text style={styles.label}>Tiempo estimado</Text>
+
         <TextInput
           style={styles.input}
           placeholder="Tiempo estimado (min)"
+          placeholderTextColor={theme.colors.textSecondary}
           keyboardType="numeric"
           inputMode="numeric"
           value={estimatedTime}
           onChangeText={handleEstimatedTimeChange}
         />
-        {!!errors.estimatedTime && <Text style={styles.errorText}>{errors.estimatedTime}</Text>}
 
-        <Text style={styles.label}>Ejercicios Seleccionados ({selectedExercises.length})</Text>
+        {!!errors.estimatedTime && (
+          <Text style={styles.errorText}>{errors.estimatedTime}</Text>
+        )}
+
+        <Text style={styles.label}>
+          Ejercicios Seleccionados ({selectedExercises.length})
+        </Text>
+
         {selectedExercisesDetails.length > 0 ? (
           <View style={styles.selectedExercisesContainer}>
             {selectedExercisesDetails.map((exercise, index) => (
-              <View key={exercise.exercise_id} style={styles.selectedExerciseItem}>
+              <View
+                key={exercise.exercise_id}
+                style={styles.selectedExerciseItem}
+              >
                 <View style={styles.selectedExerciseInfo}>
                   <Text style={styles.exerciseNumber}>{index + 1}</Text>
-                  <Text style={styles.selectedExerciseName}>{exercise.name}</Text>
+
+                  <Text style={styles.selectedExerciseName}>
+                    {exercise.name}
+                  </Text>
+
                   <TextInput
                     style={styles.setsInput}
                     placeholder="Sets"
+                    placeholderTextColor={theme.colors.textSecondary}
                     keyboardType="numeric"
-                    value={exerciseSets[exercise.exercise_id] || ''}
-                    onChangeText={(text) => handleSetsChange(exercise.exercise_id, text)}
+                    value={exerciseSets[exercise.exercise_id] || ""}
+                    onChangeText={(text) =>
+                      handleSetsChange(exercise.exercise_id, text)
+                    }
                   />
                 </View>
-                <Pressable 
+
+                <Pressable
                   style={styles.removeButton}
                   onPress={() => removeExercise(exercise.exercise_id)}
                 >
-                  <Text style={styles.removeButtonText}>✕</Text>
+                  <Text style={styles.removeButtonText}>x</Text>
                 </Pressable>
               </View>
             ))}
@@ -124,52 +160,70 @@ export default function RoutineForm({
         ) : (
           <Text style={styles.emptyText}>No has agregado ejercicios aún</Text>
         )}
-        {!!errors.exercises && <Text style={styles.errorText}>{errors.exercises}</Text>}
+
+        {!!errors.exercises && (
+          <Text style={styles.errorText}>{errors.exercises}</Text>
+        )}
+
         {!!errors.sets && <Text style={styles.errorText}>{errors.sets}</Text>}
 
         <Text style={styles.label}>Agregar Ejercicios</Text>
+
         <TextInput
           style={styles.searchInput}
           placeholder="Buscar ejercicio..."
+          placeholderTextColor={theme.colors.textSecondary}
           value={searchQuery}
           onChangeText={setSearchQuery}
         />
 
         <View style={styles.availableExercisesContainer}>
-          {availableExercises.length > 0 ? (
-            availableExercises.map((exercise) => (
-              <View key={exercise.exercise_id} style={styles.availableExerciseItem}>
-                <Text style={styles.availableExerciseName}>{exercise.name}</Text>
-                <Pressable 
-                  style={styles.addButton}
-                  onPress={() => addExercise(exercise.exercise_id)}
+          <ScrollView nestedScrollEnabled showsVerticalScrollIndicator>
+            {availableExercises.length > 0 ? (
+              availableExercises.map((exercise) => (
+                <View
+                  key={exercise.exercise_id}
+                  style={styles.availableExerciseItem}
                 >
-                  <Text style={styles.addButtonText}>+</Text>
-                </Pressable>
-              </View>
-            ))
-          ) : (
-            <Text style={styles.emptyText}>
-              {searchQuery ? 'No se encontraron ejercicios' : 'Todos los ejercicios han sido agregados'}
-            </Text>
-          )}
+                  <Text style={styles.availableExerciseName}>
+                    {exercise.name}
+                  </Text>
+
+                  <Pressable
+                    style={styles.addButton}
+                    onPress={() => addExercise(exercise.exercise_id)}
+                  >
+                    <Text style={styles.addButtonText}>+</Text>
+                  </Pressable>
+                </View>
+              ))
+            ) : (
+              <Text style={styles.emptyText}>
+                {searchQuery
+                  ? "No se encontraron ejercicios"
+                  : "Todos los ejercicios han sido agregados"}
+              </Text>
+            )}
+          </ScrollView>
         </View>
 
-        <View style={styles.row}>
-          <Text style={[styles.label, styles.share]}>Compartir</Text>
+        <View style={styles.shareRow}>
+          <Text style={styles.shareLabel}>Compartir</Text>
+
           <Switch
             value={isShared}
             onValueChange={setIsShared}
-            trackColor={{ false: '#ccc', true: '#fff' }}
-            thumbColor={Platform.OS === 'android' 
-              ? theme.colors.primary 
-              : '#fff'}
-            ios_backgroundColor={theme.colors.border}
+            trackColor={{
+              false: "#ccc",
+              true: theme.colors.primary,
+            }}
+            thumbColor="#fff"
+            ios_backgroundColor="#ccc"
           />
         </View>
 
-        <Button 
-          title={submitLabel} 
+        <Button
+          title={submitLabel}
           onPress={handleSubmit}
           disabled={isLoading}
         />
@@ -180,32 +234,39 @@ export default function RoutineForm({
 
 const styles = StyleSheet.create({
   addButton: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.primary,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: theme.colors.divider,
     borderRadius: 15,
+    borderWidth: 1,
     height: 30,
-    justifyContent: 'center',
     width: 30,
   },
+
   addButtonText: {
     color: theme.colors.textPrimary,
+    fontFamily: "Roboto_400Regular",
     fontSize: 20,
-    fontWeight: 'bold',
+    lineHeight: 20,
+    textAlign: "center",
   },
+
   availableExerciseItem: {
-    alignItems: 'center',
+    alignItems: "center",
     borderBottomColor: theme.colors.divider,
     borderBottomWidth: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     paddingVertical: 10,
   },
+
   availableExerciseName: {
     color: theme.colors.textPrimary,
     flex: 1,
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
   },
+
   availableExercisesContainer: {
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.divider,
@@ -215,52 +276,62 @@ const styles = StyleSheet.create({
     maxHeight: 250,
     padding: 10,
   },
-  container: { 
-    flexGrow: 1, 
-    padding: 20, 
+
+  container: {
+    flexGrow: 1,
+    padding: 20,
     paddingBottom: 40,
-    paddingTop: 10 
+    paddingTop: 10,
   },
-  description: { minHeight: 120 },
+
+  description: {
+    minHeight: 120,
+  },
+
   emptyText: {
     color: theme.colors.textSecondary,
     fontFamily: "Roboto_400Regular",
     fontSize: 14,
-    fontStyle: 'italic',
+    fontStyle: "italic",
     marginBottom: 15,
-    textAlign: 'center',
+    textAlign: "center",
   },
+
   errorText: {
     color: theme.colors.error,
     fontFamily: "Roboto_400Regular",
     fontSize: 14,
     marginBottom: 8,
     marginLeft: 5,
-    marginTop: 5
+    marginTop: 5,
   },
+
   exerciseNumber: {
-    alignSelf: 'center',
+    alignSelf: "center",
     backgroundColor: theme.colors.primary,
     borderRadius: 12,
     color: theme.colors.textPrimary,
     fontSize: 12,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     height: 24,
     lineHeight: 24,
     minWidth: 24,
-    textAlign: 'center',
+    textAlign: "center",
   },
+
   input: {
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.divider,
     borderRadius: 8,
     borderWidth: 1,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textPrimary,
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     marginBottom: 5,
     padding: 10,
-    width: '100%',
+    width: "100%",
   },
+
   label: {
     color: theme.colors.textPrimary,
     fontFamily: "Roboto_400Regular",
@@ -270,61 +341,77 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingLeft: 3,
   },
+
   removeButton: {
-    alignItems: 'center',
-    backgroundColor: theme.colors.error,
+    alignItems: "center",
+    justifyContent: "center",
+    borderColor: theme.colors.error,
     borderRadius: 15,
+    borderWidth: 1,
     height: 30,
-    justifyContent: 'center',
+    marginLeft: 10,
     width: 30,
   },
+
   removeButtonText: {
-    color: theme.colors.textPrimary,
-    fontSize: 18,
-    fontWeight: 'bold',
+    color: theme.colors.error,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 20,
+    lineHeight: 20,
+    textAlign: "center",
+    includeFontPadding: false,
+    transform: [{ translateY: -1 }],
   },
+
   row: {
-    flexDirection: 'row',
+    flexDirection: "row",
     marginBottom: 10,
     marginTop: 20,
   },
+
   searchInput: {
-    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.divider,
     borderRadius: 8,
     borderWidth: 1,
-    color: theme.colors.textSecondary,
+    color: theme.colors.textPrimary,
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
     marginBottom: 15,
     padding: 10,
-    width: '100%',
+    width: "100%",
   },
+
   selectedExerciseInfo: {
-    alignItems: 'center',
+    alignItems: "center",
     flex: 1,
-    flexDirection: 'row',
+    flexDirection: "row",
     gap: 10,
   },
+
   selectedExerciseItem: {
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: theme.colors.surface,
     borderColor: theme.colors.primary,
     borderLeftWidth: 4,
     borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     marginBottom: 10,
     padding: 12,
   },
+
   selectedExerciseName: {
     color: theme.colors.textPrimary,
     flex: 1,
     fontFamily: "Roboto_400Regular",
     fontSize: 16,
   },
+
   selectedExercisesContainer: {
     marginBottom: 15,
   },
+
   setsInput: {
     borderColor: theme.colors.borderSecondary,
     borderRadius: 6,
@@ -333,8 +420,25 @@ const styles = StyleSheet.create({
     fontFamily: "Roboto_400Regular",
     fontSize: 14,
     padding: 6,
-    textAlign: 'center',
+    textAlign: "center",
     width: 60,
   },
-  share: { marginRight: 18, marginTop: 0 },
+
+  share: {
+    marginRight: 18,
+    marginTop: 0,
+  },
+  shareRow: {
+    alignItems: "center",
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBottom: 15,
+    marginTop: 15,
+  },
+
+  shareLabel: {
+    color: theme.colors.textPrimary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 16,
+  },
 });

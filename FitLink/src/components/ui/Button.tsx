@@ -5,27 +5,44 @@ import { theme } from '../../constants/theme';
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'danger';
   disabled?: boolean;
 }
 
-export const Button: FC<ButtonProps> = ({ 
-  title, 
-  onPress, 
+export const Button: FC<ButtonProps> = ({
+  title,
+  onPress,
   variant = 'primary',
-  disabled = false 
+  disabled = false,
 }) => {
   const getButtonStyle = () => {
-    if (disabled) return [styles.button, styles.buttonDisabled];
-    return variant === 'primary' 
-      ? [styles.button, styles.buttonPrimary]
-      : [styles.button, styles.buttonSecondary];
+    if (disabled) {
+      return [styles.button, styles.buttonDisabled];
+    }
+
+    switch (variant) {
+      case 'secondary':
+        return [styles.button, styles.buttonSecondary];
+
+      case 'danger':
+        return [styles.button, styles.buttonDanger];
+
+      default:
+        return [styles.button, styles.buttonPrimary];
+    }
   };
 
   const getTextStyle = () => {
-    return variant === 'primary' 
-      ? [styles.text, styles.textPrimary]
-      : [styles.text, styles.textSecondary];
+    switch (variant) {
+      case 'secondary':
+        return [styles.text, styles.textSecondary];
+
+      case 'danger':
+        return [styles.text, styles.textDanger];
+
+      default:
+        return [styles.text, styles.textPrimary];
+    }
   };
 
   return (
@@ -52,29 +69,49 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     width: '100%',
   },
-  buttonDisabled: {
-    backgroundColor: theme.colors.divider || '#ccc',
-  },
-  buttonPressed: {
-    opacity: 0.8,
-  },
+
   buttonPrimary: {
     backgroundColor: theme.colors.primary,
   },
+
   buttonSecondary: {
     backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.divider,
+    borderWidth: 1,
   },
+
+  buttonDanger: {
+    backgroundColor: theme.colors.surface,
+    borderColor: theme.colors.error,
+    borderWidth: 1,
+  },
+
+  buttonDisabled: {
+    backgroundColor: theme.colors.divider,
+  },
+
+  buttonPressed: {
+    opacity: 0.8,
+  },
+
   container: {
     marginBottom: 10,
   },
+
   text: {
     fontSize: 16,
     fontWeight: '500',
   },
+
   textPrimary: {
-    color: '#fff',
+    color: theme.colors.textPrimary,
   },
+
   textSecondary: {
     color: theme.colors.textPrimary,
+  },
+
+  textDanger: {
+    color: theme.colors.error,
   },
 });

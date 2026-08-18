@@ -14,7 +14,7 @@ export async function fetchRoutine(routineId: string) {
         exercise_id,
         exercises ( name )
       )
-    `
+    `,
     )
     .eq("routine_id", routineId)
     .single();
@@ -23,7 +23,7 @@ export async function fetchRoutine(routineId: string) {
 export async function endSession(
   routineId: string,
   payload: FinalizedSet[],
-  duration: number
+  duration: number,
 ): Promise<boolean> {
   try {
     const {
@@ -41,14 +41,24 @@ export async function endSession(
 
     const now = new Date();
 
+    const localDate =
+      `${now.getFullYear()}-` +
+      `${String(now.getMonth() + 1).padStart(2, "0")}-` +
+      `${String(now.getDate()).padStart(2, "0")}`;
+
+    const localTime =
+      `${String(now.getHours()).padStart(2, "0")}:` +
+      `${String(now.getMinutes()).padStart(2, "0")}:` +
+      `${String(now.getSeconds()).padStart(2, "0")}`;
+
     const { data: session } = await supabase
       .from("training_sessions")
       .insert({
         user_id: userRow.user_id,
         routine_id: routineId,
         duration,
-        date: now.toISOString().split("T")[0],
-        time: now.toTimeString().split(" ")[0],
+        date: localDate,
+        time: localTime,
       })
       .select()
       .single();
@@ -63,7 +73,7 @@ export async function endSession(
           order: set.serieIndex,
           weight: set.previous ? 0 : set.weight,
           reps: set.previous ? 0 : set.reps,
-        }))
+        })),
       );
 
     return !setsError;

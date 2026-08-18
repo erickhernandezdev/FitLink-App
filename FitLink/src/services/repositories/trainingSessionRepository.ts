@@ -10,7 +10,10 @@ export async function getTrainingSessionsByUserId(userId: number) {
       date,
       time,
       routines (
-        name
+        name,
+        routine_exercises (
+          exercise_id
+        )
       )
     `)
     .eq('user_id', userId)

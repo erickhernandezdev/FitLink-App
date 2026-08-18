@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { getAllExercises } from '../services/repositories/exerciseRepository';
+import { useState, useEffect, useRef } from "react";
+import { getAllExercises } from "../services/repositories/exerciseRepository";
 
 interface Exercise {
   exercise_id: number;
@@ -19,20 +19,24 @@ interface UseRoutineFormProps {
 
 export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
   const initialDataRef = useRef(initialData);
-  
-  const [name, setName] = useState(initialData?.name || '');
-  const [description, setDescription] = useState(initialData?.description || '');
-  const [estimatedTime, setEstimatedTime] = useState(initialData?.estimatedTime || '');
+
+  const [name, setName] = useState(initialData?.name || "");
+  const [description, setDescription] = useState(
+    initialData?.description || "",
+  );
+  const [estimatedTime, setEstimatedTime] = useState(
+    initialData?.estimatedTime || "",
+  );
   const [isShared, setIsShared] = useState(initialData?.isShared || false);
   const [selectedExercises, setSelectedExercises] = useState<number[]>(
-    initialData?.selectedExercises || []
+    initialData?.selectedExercises || [],
   );
   const [exerciseSets, setExerciseSets] = useState<{ [key: number]: string }>(
-    initialData?.exerciseSets || {}
+    initialData?.exerciseSets || {},
   );
-  
+
   const [exercises, setExercises] = useState<Exercise[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   useEffect(() => {
@@ -48,8 +52,10 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
 
   useEffect(() => {
     if (initialData) {
-      if (!initialDataRef.current || 
-          JSON.stringify(initialDataRef.current) !== JSON.stringify(initialData)) {
+      if (
+        !initialDataRef.current ||
+        JSON.stringify(initialDataRef.current) !== JSON.stringify(initialData)
+      ) {
         initialDataRef.current = initialData;
         setName(initialData.name);
         setDescription(initialData.description);
@@ -66,8 +72,8 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     .filter((ex) => ex.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const selectedExercisesDetails = selectedExercises
-    .map(id => exercises.find(ex => ex.exercise_id === id))
-    .filter(ex => ex !== undefined) as Exercise[];
+    .map((id) => exercises.find((ex) => ex.exercise_id === id))
+    .filter((ex) => ex !== undefined) as Exercise[];
 
   const handleNameChange = (text: string) => {
     setName(text);
@@ -104,10 +110,10 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
 
   const addExercise = (exerciseId: number) => {
     setSelectedExercises([...selectedExercises, exerciseId]);
-    setExerciseSets({ ...exerciseSets, [exerciseId]: '3' });
+    setExerciseSets({ ...exerciseSets, [exerciseId]: "" });
+
     if (errors.exercises) {
       setErrors((prev) => {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { exercises, ...rest } = prev;
         return rest;
       });
@@ -115,7 +121,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
   };
 
   const removeExercise = (exerciseId: number) => {
-    setSelectedExercises(selectedExercises.filter(id => id !== exerciseId));
+    setSelectedExercises(selectedExercises.filter((id) => id !== exerciseId));
     const newSets = { ...exerciseSets };
     delete newSets[exerciseId];
     setExerciseSets(newSets);
@@ -136,7 +142,8 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     const newErrors: { [key: string]: string } = {};
 
     if (!name.trim()) newErrors.name = "El nombre es requerido";
-    if (!description.trim()) newErrors.description = "La descripción es requerida";
+    if (!description.trim())
+      newErrors.description = "La descripción es requerida";
     if (!estimatedTime.trim() || isNaN(Number(estimatedTime))) {
       newErrors.estimatedTime = "El tiempo estimado debe ser un número";
     }
@@ -144,7 +151,7 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
       newErrors.exercises = "Debes seleccionar al menos un ejercicio";
     } else {
       const invalidSets = selectedExercises.some(
-        (id) => !exerciseSets[id] || Number(exerciseSets[id]) <= 0
+        (id) => !exerciseSets[id] || Number(exerciseSets[id]) <= 0,
       );
       if (invalidSets) {
         newErrors.sets = "Debes ingresar el número de sets para cada ejercicio";
@@ -162,29 +169,30 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     isShared,
     selectedExercises,
     exerciseSets: Object.fromEntries(
-      Object.entries(exerciseSets).map(([k, v]) => [k, Number(v)])
+      Object.entries(exerciseSets).map(([k, v]) => [k, Number(v)]),
     ),
   });
 
   const hasChanges = () => {
     const initial = initialDataRef.current;
-    
+
     // Si no hay datos iniciales, verificar si el formulario tiene contenido
     if (!initial) {
       return (
-        name.trim() !== '' ||
-        description.trim() !== '' ||
-        estimatedTime.trim() !== '' ||
+        name.trim() !== "" ||
+        description.trim() !== "" ||
+        estimatedTime.trim() !== "" ||
         selectedExercises.length > 0
       );
     }
-    
+
     return (
       name !== initial.name ||
       description !== initial.description ||
       estimatedTime !== initial.estimatedTime ||
       isShared !== initial.isShared ||
-      JSON.stringify([...selectedExercises].sort((a, b) => a - b)) !== JSON.stringify([...initial.selectedExercises].sort((a, b) => a - b)) ||
+      JSON.stringify([...selectedExercises].sort((a, b) => a - b)) !==
+        JSON.stringify([...initial.selectedExercises].sort((a, b) => a - b)) ||
       JSON.stringify(exerciseSets) !== JSON.stringify(initial.exerciseSets)
     );
   };
@@ -200,17 +208,17 @@ export function useRoutineForm({ initialData }: UseRoutineFormProps = {}) {
     errors,
     availableExercises,
     selectedExercisesDetails,
-    
+
     setIsShared,
     setSearchQuery,
-    
+
     handleNameChange,
     handleDescriptionChange,
     handleEstimatedTimeChange,
     addExercise,
     removeExercise,
     handleSetsChange,
-    
+
     validate,
     getFormData,
     hasChanges,

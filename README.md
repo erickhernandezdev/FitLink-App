@@ -1,101 +1,160 @@
-# FitLink-App
+# FitLink — Gym Tracking Mobile Application
 
-FitLink is a cross-platform application designed to help users track their physical activity, with a primary focus on gym-goers. Built with Expo, React Native, and TypeScript, FitLink supports both Android and iOS platforms.
+## Description
 
-The app allows users to create workout routines from a predefined list of exercises, log their training sessions, and engage with a social layer that encourages interaction. Users can share their routines, explore others’ workouts, and save routines that match their goals.
+FitLink is a cross-platform mobile application for iOS and Android developed as a university project at the University of Costa Rica by a team of 3 developers. The app allows gym users to create custom workout routines from a predefined exercise list, start and log training sessions, track workout history and training statistics, and engage with a social layer that encourages interaction. Users can share routines, explore others' workouts, and save routines that match their goals.
 
-This initiative was born from a desire to offer a reliable and innovative alternative in the fitness space — one that emphasizes community support and mutual improvement. By enabling users to exchange routines and advice, FitLink fosters a collaborative environment where progress is shared and celebrated.
+## Tech Stack
 
-## Prerequisites
+**Framework:** React Native (Expo)  
+**Language:** TypeScript  
+**Backend & Auth:** Supabase  
+**Testing:** Jest, React Testing Library  
+**Quality:** SonarQube, Semgrep  
+**Tools:** Git, GitHub, ESLint, Agile/Scrum  
 
-Before you begin, make sure you have the following installed:
+## Features
 
-- Node.js (v18 or higher recommended). You can download it [here](https://nodejs.org/).
+- User authentication and session management via Supabase
+- Create and manage custom workout routines from a predefined exercise library
+- Configure routines with exercises, sets, descriptions, estimated workout time, and sharing options
+- Start training sessions directly from any saved routine
+- Smart "Routine of the Day" recommendation based on workout history and routine duration
+- Log exercises with sets, reps, weights, and workout duration
+- Track workout history organized by year and month
+- View training statistics by week, month, year, or all-time
+- Navigate between previous and current time periods to analyze training activity
+- Track total workouts, training time, and exercises completed
+- Share routines and explore workouts created by other users
+- Save and manage routines for future workouts
+- Cross-platform support for iOS and Android
+- ~90% unit test coverage using Jest and React Testing Library
+- Static code analysis with SonarQube and Semgrep
 
-## Dependency Management
-
-FitLink uses the package versions recommended by Expo for maximum compatibility and stability. While some internal dependencies may show deprecation warnings, following Expo’s suggestions ensures that the app works reliably across platforms and with Expo tooling. This approach is preferred over always using the latest package versions, as Expo maintains and tests its supported versions for seamless integration.  
-If you choose to update dependencies beyond Expo’s recommendations, you may encounter compatibility issues or unexpected behavior.
-
-## Project Setup
-
-### 1. Clone the Project
-
-```
-git clone https://github.com/erickhernandezdev/FitLink-App.git
-```
-
-### 2. Access the project folder
-
-```
-cd FitLink-App/FitLink
-```
-
-### 3. Download the necessary npm packages
-
-```
-npm install
-```
-
-### 4. Run the project
+## Project Structure
 
 ```
-npx expo start
+FitLink/
+├── assets/               # Images, fonts and static assets
+├── src/
+│   ├── app/              # Routed screens using Expo Router
+│   ├── components/       # Reusable UI components
+│   ├── constants/        # App constants and configuration
+│   ├── containers/       # Container components
+│   ├── hooks/            # Custom React hooks
+│   ├── services/         # Supabase and API services
+│   └── utils/            # Helper functions
+├── tests/                # Unit and integration tests
+├── app.json              # Expo configuration
+├── eas.json              # EAS Build configuration
+└── jest.config.js        # Jest configuration
 ```
 
-**Note:** If you want to try it on Android, you must download Expo Go from the Play Store and scan the QR code. For iOS, you only need to scan the QR code with your phone's camera.
+## Demo
 
-## Linting & Formatting
+**Android APK** — Scan to download or [click here](https://expo.dev/accounts/erickhernandez18s-team/projects/fitlink-app/builds/1c2de330-1191-4356-895f-d72fc8a23b63)
 
-We use ESLint to enforce best practices and catch common errors in both JavaScript and TypeScript.
+<div align="center">
+  <img src="img/apkQR.jpg" width="200" alt="QR Code - Download APK">
+</div>
 
+Enable "Install from unknown sources" in your device settings if prompted.
 
-To run lint checks:
+## Screenshots
 
+<p align="center">
+  <img src="./img/Login.jpeg" width="220" alt="Login" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./img/MainPage.jpeg" width="220" alt="Main Page" />
+</p>
+
+<p align="center">
+  <img src="./img/Detail.jpeg" width="220" alt="Detail" />
+  &nbsp;&nbsp;&nbsp;&nbsp;
+  <img src="./img/Workout.jpeg" width="220" alt="Workout" />
+</p>
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js v18 or higher — [Download here](https://nodejs.org/)
+- Expo Go installed on your mobile device — [Download here](https://expo.dev/go)
+
+### Installation
+
+1. Clone the repository
+```bash
+   git clone https://github.com/erickhernandezdev/FitLink-App.git
 ```
-npx eslint .
+
+2. Navigate to the project folder
+```bash
+   cd FitLink-App/FitLink
 ```
 
-To automatically fix issues:
-
+3. Install dependencies
+```bash
+   npm install
 ```
-npx eslint . --fix
+
+4. Set up environment variables
+```bash
+   cp .env.example .env
 ```
 
-The ESLint config is located in `eslint.config.cjs`.
+5. Run the project
+```bash
+   npx expo start
+```
+
+> **Note:** FitLink uses package versions recommended by Expo for maximum compatibility. Updating dependencies beyond Expo's recommendations may cause compatibility issues.
 
 ## Testing
 
-This project uses Jest and React Native Testing Library to ensure component reliability and maintainable logic across platforms.
+This project uses Jest and React Testing Library to ensure component reliability across platforms.
 
-To run Tests
-
-```
+Run all tests:
+```bash
 npx jest
+```
+
+Generate coverage report:
+```bash
+npx jest --coverage
 ```
 
 Tests are located in the `/tests` directory and follow the `.test.tsx` naming convention.
 
-To generate a coverage report:
+## Linting
 
+Run lint checks:
+```bash
+npx eslint .
 ```
-npx jest --coverage
+
+Auto-fix issues:
+```bash
+npx eslint . --fix
 ```
 
-## Project Structure
+## Environment Variables
 
-FitLink is organized to support modular development and clear onboarding. Here's a breakdown of the main folders:
+Create a `.env` file in the root with the following structure:
 
-- **app/:** Contains all the routed screens using Expo Router. Each file or folder here maps directly to a route. Includes tab navigation, layout definitions, and entry points like index.tsx.
+```env
+EXPO_PUBLIC_SUPABASE_URL=
+EXPO_PUBLIC_SUPABASE_ANON_KEY=
+```
 
-- **components/:** Reusable UI components shared across screens, such as styled text blocks, info cards, or custom buttons.
+## Team
 
-- **assets/:** Static resources like fonts, images, and icons used throughout the app.
+Developed as a university project at the University of Costa Rica.
 
-- **tests/:** Unit and integration tests for components and screens.
+- [Erick Hernandez](https://github.com/erickhernandezdev)
+- [Brayan Rivera Navarro](https://github.com/BrayanRiveraN)
+- [Rolando Villavicencio González](https://github.com/RolandoVillavicencio013)
 
-## Authors
+## License
 
-- Erick Hernández Hernández
-- Brayan Rivera Navarro
-- Rolando Villavicencio González
+This project was developed for academic purposes at the University of Costa Rica.

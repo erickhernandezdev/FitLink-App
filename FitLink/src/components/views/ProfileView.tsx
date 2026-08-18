@@ -1,40 +1,54 @@
-import React from 'react';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
-import { useProfileContainer } from '../../containers/ProfileContainer';
-import { TrainingHistory } from '../profile/TrainingHistory';
-import { Button } from '../ui/Button';
-import { theme } from '../../constants/theme';
+import React from "react";
+import { ActivityIndicator, StyleSheet, View, ScrollView } from "react-native";
+import { useProfileContainer } from "../../containers/ProfileContainer";
+import { Button } from "../ui/Button";
+import { theme } from "../../constants/theme";
+import { ProfileHeader } from "../profile/ProfileHeader";
+import { PeriodSelector } from "../profile/PeriodSelector";
+import { PeriodNavigation } from "../profile/PeriodNavigation";
+import { ProfileStats } from "../profile/ProfileStats";
 
 const ProfileView: React.FC = () => {
   const {
     username,
-    trainingHistory,
     loading,
+    period,
+    periodLabel,
+    handlePeriodChange,
+    previousPeriod,
+    nextPeriod,
+    stats,
     handleLogout,
   } = useProfileContainer();
 
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator
-          size="large"
-          color={theme.colors.primary}
-        />
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Hola, {username}</Text>
+    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+      <ProfileHeader username={username} />
 
-      <TrainingHistory sessions={trainingHistory} />
+      <PeriodSelector period={period} onPeriodChange={handlePeriodChange} />
 
-      <Button
-        title="Cerrar sesión"
-        onPress={handleLogout}
-      />
-    </View>
+      {period !== "total" && (
+        <PeriodNavigation
+          periodLabel={periodLabel}
+          onPrevious={previousPeriod}
+          onNext={nextPeriod}
+        />
+      )}
+
+      <ProfileStats stats={stats} />
+
+      <View style={styles.logoutContainer}>
+        <Button title="Cerrar sesión" onPress={handleLogout} variant="danger" />
+      </View>
+    </ScrollView>
   );
 };
 
@@ -42,19 +56,23 @@ export default ProfileView;
 
 const styles = StyleSheet.create({
   center: {
-    alignItems: 'center',
+    alignItems: "center",
     backgroundColor: theme.colors.background,
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: "center",
   },
+
   container: {
     backgroundColor: theme.colors.background,
     flex: 1,
-    padding: 20,
   },
-  title: {
-    color: theme.colors.textPrimary,
-    fontFamily: 'Roboto_700Bold',
-    fontSize: 24,
+
+  content: {
+    padding: 20,
+    paddingBottom: 40,
+  },
+
+  logoutContainer: {
+    marginTop: 30,
   },
 });

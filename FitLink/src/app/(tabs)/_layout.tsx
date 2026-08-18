@@ -2,18 +2,29 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { Tabs } from "expo-router";
 import React from "react";
 import { View } from "react-native";
-import { theme } from '../../constants/theme';
+import { theme } from "../../constants/theme";
 
-function TabBarIcon(props: Readonly<{
-  name: React.ComponentProps<typeof FontAwesome>["name"];
-  color: string;
-}>) {
+function TabBarIcon(
+  props: Readonly<{
+    name: React.ComponentProps<typeof FontAwesome>["name"];
+    color: string;
+  }>,
+) {
   return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
 }
 
-const ExploreIcon = ({ color }: { color: string }) => <TabBarIcon name="search" color={color} />;
-const HomeIcon = ({ color }: { color: string }) => <TabBarIcon name="home" color={color} />;
-const UserIcon = ({ color }: { color: string }) => <TabBarIcon name="user" color={color} />;
+const ExploreIcon = ({ color }: { color: string }) => (
+  <TabBarIcon name="search" color={color} />
+);
+const HomeIcon = ({ color }: { color: string }) => (
+  <TabBarIcon name="clock-o" color={color} />
+);
+const UserIcon = ({ color }: { color: string }) => (
+  <TabBarIcon name="user" color={color} />
+);
+const HistoryIcon = ({ color }: { color: string }) => (
+  <TabBarIcon name="history" color={color} />
+);
 
 const TabLayout: React.FC = () => {
   return (
@@ -45,6 +56,13 @@ const TabLayout: React.FC = () => {
           options={{
             title: "Entrenamiento",
             tabBarIcon: HomeIcon,
+          }}
+        />
+        <Tabs.Screen
+          name="history"
+          options={{
+            title: "Historial",
+            tabBarIcon: HistoryIcon,
           }}
         />
         <Tabs.Screen

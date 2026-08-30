@@ -1,15 +1,15 @@
 {
   "expo": {
     "name": "FitLink",
-    "slug": "FitLink",
+    "slug": "fitlink-app",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/Logo.png",
     "scheme": "fitlink",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash-icon.png",
+      "image": "./assets/images/Logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -18,11 +18,12 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "foregroundImage": "./assets/images/Logo.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.erickhernandez18steam.fitlinkapp"
     },
     "web": {
       "bundler": "metro",
@@ -35,6 +36,19 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "3d3a9fad-c50c-45ad-a151-07f865c1308b"
+      }
+    },
+    "owner": "erickhernandez18s-team",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3d3a9fad-c50c-45ad-a151-07f865c1308b"
     }
   }
 }

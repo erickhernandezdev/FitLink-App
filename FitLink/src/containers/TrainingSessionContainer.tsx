@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { theme } from "../constants/theme";
@@ -7,14 +6,18 @@ import {
   FinalizedSet,
   Routine,
 } from "@/src/components/views/TrainingSessionView";
-import { fetchRoutine, endSession } from "@/src/services/trainingSessionService";
+import {
+  fetchRoutine,
+  endSession,
+} from "@/src/services/trainingSessionService";
 
 interface TrainingSessionContainerProps {
   routineId: string;
 }
 
-export default function TrainingSessionContainer({ routineId }: TrainingSessionContainerProps) {
-  const router = useRouter();
+export default function TrainingSessionContainer({
+  routineId,
+}: TrainingSessionContainerProps) {
   const [routine, setRoutine] = useState<Routine | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -28,12 +31,13 @@ export default function TrainingSessionContainer({ routineId }: TrainingSessionC
     loadRoutine();
   }, [routineId]);
 
-  const handleEndSession = async (payload: FinalizedSet[], duration: number): Promise<boolean> => {
-    await endSession(routineId, payload, duration);
-    router.replace("/(tabs)/routines");
-    return true;
+  const handleEndSession = async (
+    payload: FinalizedSet[],
+    duration: number,
+  ): Promise<boolean> => {
+    return await endSession(routineId, payload, duration);
   };
-  
+
   if (loading || !routine) {
     return (
       <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>

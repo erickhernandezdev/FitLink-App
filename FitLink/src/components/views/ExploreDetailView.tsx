@@ -1,18 +1,22 @@
-import React from 'react';
-import { useExploreDetailContainer } from '../../containers/ExploreDetailContainer';
-import { ExploreRoutineDetailContent } from '../details/ExploreRoutineDetailContent';
+import React from "react";
+import { useExploreDetailContainer } from "../../containers/ExploreDetailContainer";
+import { ExploreRoutineDetailContent } from "../details/ExploreRoutineDetailContent";
 
 interface ExploreDetailViewProps {
   routineId: string | undefined;
 }
 
-export const ExploreDetailView: React.FC<ExploreDetailViewProps> = ({ routineId }) => {
-  const { 
-    routine, 
-    loading, 
-    isCloned, 
-    isCloning, 
-    handleClone 
+export const ExploreDetailView: React.FC<ExploreDetailViewProps> = ({
+  routineId,
+}) => {
+  const {
+    routine,
+    loading,
+    isCloned,
+    isCloning,
+    handleClone,
+    showSuccessAlert,
+    setShowSuccessAlert,
   } = useExploreDetailContainer(routineId);
 
   return (
@@ -22,6 +26,8 @@ export const ExploreDetailView: React.FC<ExploreDetailViewProps> = ({ routineId 
       isCloned={isCloned}
       isCloning={isCloning}
       onClone={handleClone}
+      showSuccessAlert={showSuccessAlert}
+      onCloseSuccessAlert={() => setShowSuccessAlert(false)}
     />
   );
 };

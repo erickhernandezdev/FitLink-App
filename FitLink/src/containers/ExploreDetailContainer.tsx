@@ -2,6 +2,7 @@ import { useState, useCallback } from "react";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
 import { Alert } from "react-native";
+import { CustomAlert } from "../components/ui/CustomAlert";
 import { supabase } from "../services/supabase";
 import {
   getSharedRoutineById,
@@ -63,6 +64,8 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
   const [isCloned, setIsCloned] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
+
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
@@ -158,17 +161,7 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
         return;
       }
       setIsCloned(true);
-      Alert.alert(
-        "¡Rutina guardada!",
-        "La rutina se ha copiado a tus rutinas personales.",
-        [
-          {
-            text: "Ver en Mis Rutinas",
-            onPress: () => router.push("/(tabs)/routines"),
-          },
-          { text: "OK", style: "cancel" },
-        ],
-      );
+      setShowSuccessAlert(true);
     } catch {
       Alert.alert("Error", "Ocurrió un error inesperado al guardar");
     } finally {
@@ -182,5 +175,7 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
     isCloned,
     isCloning,
     handleClone,
+    showSuccessAlert,
+    setShowSuccessAlert,
   };
 };

@@ -112,7 +112,7 @@ export const ExploreRoutinesList: React.FC<ExploreRoutinesListProps> = ({
           />
 
           <ExploreSectionCarousel
-            title="Más Populades"
+            title="Más Populares"
             routines={popularRoutines}
             onRoutinePress={onRoutinePress}
           />

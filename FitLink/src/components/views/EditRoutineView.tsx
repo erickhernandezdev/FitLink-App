@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigation } from 'expo-router';
-import { View, ActivityIndicator, StyleSheet, Text, Alert, Platform } from 'react-native';
+import { View, ActivityIndicator, StyleSheet, Text } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useEditRoutineContainer } from '../../containers/EditRoutineContainer';
 import RoutineForm from '../forms/RoutineForm';
+import { CustomAlert } from '../ui/CustomAlert';
 import { theme } from '../../constants/theme';
 
 interface EditRoutineViewProps {
@@ -14,54 +15,80 @@ export default function EditRoutineView({ routineId }: EditRoutineViewProps) {
   const navigation = useNavigation();
   const container = useEditRoutineContainer({ routineId });
 
+  const [showUnsavedChangesAlert, setShowUnsavedChangesAlert] =
+    useState(false);
+
+  const [pendingNavigationAction, setPendingNavigationAction] =
+    useState<any>(null);
+
   useEffect(() => {
     const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-      // No bloquear si ya se guardó exitosamente o no hay cambios
       if (!container.shouldBlockNavigation || !container.hasChanges()) {
         return;
       }
 
       e.preventDefault();
 
-      if (Platform.OS === 'web') {
-        const confirmed = window.confirm('Hay cambios sin guardar. ¿Deseas salir?');
-        if (confirmed) {
-          navigation.dispatch(e.data.action);
-        }
-      } else {
-        Alert.alert(
-          'Cambios sin guardar',
-          '¿Deseas salir sin guardar los cambios?',
-          [
-            { text: 'Cancelar', style: 'cancel' },
-            {
-              text: 'Salir',
-              style: 'destructive',
-              onPress: () => navigation.dispatch(e.data.action),
-            },
-          ]
-        );
-      }
+      setPendingNavigationAction(e.data.action);
+      setShowUnsavedChangesAlert(true);
     });
 
     return unsubscribe;
-  }, [navigation, container.shouldBlockNavigation, container.hasChanges]);
-
-  if (container.isLoading) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <View style={styles.center}>
-          <ActivityIndicator size="large" color={theme.colors.primary} />
-          <Text style={styles.loadingText}>Cargando rutina...</Text>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  }, [
+    navigation,
+    container.shouldBlockNavigation,
+    container.hasChanges,
+  ]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <RoutineForm {...container} submitLabel="Guardar cambios" />
-    </SafeAreaView>
+    <>
+      {container.isLoading ? (
+        <SafeAreaView style={styles.container}>
+          <View style={styles.center}>
+            <ActivityIndicator
+              size="large"
+              color={theme.colors.primary}
+            />
+            <Text style={styles.loadingText}>
+              Cargando rutina...
+            </Text>
+          </View>
+        </SafeAreaView>
+      ) : (
+        <SafeAreaView style={styles.container}>
+          <RoutineForm
+            {...container}
+            submitLabel="Guardar cambios"
+          />
+        </SafeAreaView>
+      )}
+
+      <CustomAlert
+        visible={showUnsavedChangesAlert}
+        title="Cambios sin guardar"
+        message="¿Deseas salir sin guardar los cambios?"
+        type="warning"
+        buttons={[
+          {
+            text: 'Cancelar',
+            variant: 'secondary',
+          },
+          {
+            text: 'Salir',
+            variant: 'danger',
+            onPress: () => {
+              if (pendingNavigationAction) {
+                navigation.dispatch(pendingNavigationAction);
+              }
+            },
+          },
+        ]}
+        onClose={() => {
+          setShowUnsavedChangesAlert(false);
+          setPendingNavigationAction(null);
+        }}
+      />
+    </>
   );
 }
 

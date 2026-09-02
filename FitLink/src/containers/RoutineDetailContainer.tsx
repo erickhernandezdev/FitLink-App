@@ -1,9 +1,8 @@
-import { useState, useCallback } from 'react';
-import { useRouter } from 'expo-router';
-import { useFocusEffect } from '@react-navigation/native';
-import { Alert } from 'react-native';
-import { getRoutineById } from '../services/repositories/routineRepository';
-import { deleteRoutine } from '../services/delete-routine';
+import { useState, useCallback } from "react";
+import { useRouter } from "expo-router";
+import { useFocusEffect } from "@react-navigation/native";
+import { getRoutineById } from "../services/repositories/routineRepository";
+import { deleteRoutine } from "../services/delete-routine";
 
 interface Exercise {
   exercise_id: number;
@@ -37,13 +36,22 @@ interface RawRoutineExercise {
 
 export const useRoutineDetailContainer = (routineId: string | undefined) => {
   const router = useRouter();
+
   const [routine, setRoutine] = useState<RoutineDetail | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [alertTitle, setAlertTitle] = useState("Error");
+  const [alertType, setAlertType] = useState<
+    "success" | "error" | "warning" | "info"
+  >("error");
+
+  const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false);
 
   useFocusEffect(
     useCallback(() => {
       if (routineId) loadRoutineDetail();
-    }, [routineId])
+    }, [routineId]),
   );
 
   async function loadRoutineDetail() {
@@ -51,41 +59,45 @@ export const useRoutineDetailContainer = (routineId: string | undefined) => {
       setLoading(true);
 
       if (!routineId) {
-        Alert.alert('Error', 'ID de rutina no válido');
-        router.back();
+        setAlertTitle("Error");
+        setAlertType("error");
+        setAlertMessage("ID de rutina no válido");
         return;
       }
 
       const { routine, error } = await getRoutineById(routineId);
 
       if (error || !routine) {
-        Alert.alert('Error', 'No se pudo cargar la rutina');
-        router.back();
+        setAlertTitle("Error");
+        setAlertType("error");
+        setAlertMessage("No se pudo cargar la rutina");
         return;
       }
 
-      // Ordenar ejercicios por 'order'
       if (routine.routine_exercises) {
         (routine.routine_exercises as unknown as RawRoutineExercise[]).sort(
-          (a, b) => a.order - b.order
+          (a, b) => a.order - b.order,
         );
       }
 
       const processedData: RoutineDetail = {
         ...routine,
         routine_exercises:
-          (routine.routine_exercises as unknown as RawRoutineExercise[])?.map((re) => ({
-            routine_exercise_id: re.routine_exercise_id,
-            order: re.order,
-            sets: re.sets,
-            exercises: re.exercises || null,
-          })) || [],
+          (routine.routine_exercises as unknown as RawRoutineExercise[])?.map(
+            (re) => ({
+              routine_exercise_id: re.routine_exercise_id,
+              order: re.order,
+              sets: re.sets,
+              exercises: re.exercises || null,
+            }),
+          ) || [],
       };
 
       setRoutine(processedData);
     } catch {
-      Alert.alert('Error', 'Ocurrió un error inesperado');
-      router.back();
+      setAlertTitle("Error");
+      setAlertType("error");
+      setAlertMessage("Ocurrió un error inesperado");
     } finally {
       setLoading(false);
     }
@@ -96,10 +108,44 @@ export const useRoutineDetailContainer = (routineId: string | undefined) => {
   };
 
   const handleDelete = () => {
-    deleteRoutine({
-      routineId: routineId as string,
-      onSuccess: () => router.back(),
-    });
+    setShowDeleteConfirmation(true);
+  };
+
+  const cancelDelete = () => {
+    setShowDeleteConfirmation(false);
+  };
+
+  const confirmDelete = async () => {
+    setShowDeleteConfirmation(false);
+
+    if (!routineId) {
+      setAlertTitle("Error");
+      setAlertType("error");
+      setAlertMessage("ID de rutina no válido");
+      return;
+    }
+
+    const result = await deleteRoutine(routineId);
+
+    if (!result.success) {
+      setAlertTitle("Error");
+      setAlertType("error");
+      setAlertMessage(result.error ?? "No se pudo eliminar la rutina");
+      return;
+    }
+
+    setAlertTitle("Éxito");
+    setAlertType("success");
+    setAlertMessage("La rutina se eliminó correctamente");
+  };
+
+  const clearAlert = () => {
+    setAlertMessage(null);
+  };
+
+  const handleSuccessAlertClose = () => {
+    setAlertMessage(null);
+    router.back();
   };
 
   return {
@@ -107,5 +153,13 @@ export const useRoutineDetailContainer = (routineId: string | undefined) => {
     loading,
     handleEdit,
     handleDelete,
+    showDeleteConfirmation,
+    cancelDelete,
+    confirmDelete,
+    alertMessage,
+    alertTitle,
+    alertType,
+    clearAlert,
+    handleSuccessAlertClose,
   };
 };

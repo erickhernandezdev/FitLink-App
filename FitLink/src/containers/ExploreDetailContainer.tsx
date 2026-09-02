@@ -1,8 +1,6 @@
 import { useState, useCallback } from "react";
 import { useRouter } from "expo-router";
 import { useFocusEffect } from "@react-navigation/native";
-import { Alert } from "react-native";
-import { CustomAlert } from "../components/ui/CustomAlert";
 import { supabase } from "../services/supabase";
 import {
   getSharedRoutineById,
@@ -60,12 +58,14 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
   const router = useRouter();
 
   const [routine, setRoutine] = useState<ExploreRoutineDetail | null>(null);
+
   const [loading, setLoading] = useState(true);
   const [isCloned, setIsCloned] = useState(false);
   const [isCloning, setIsCloning] = useState(false);
   const [currentUserId, setCurrentUserId] = useState<number | null>(null);
 
   const [showSuccessAlert, setShowSuccessAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   useFocusEffect(
     useCallback(() => {
@@ -78,7 +78,7 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
       setLoading(true);
 
       if (!routineId) {
-        Alert.alert("Error", "ID de rutina no válido");
+        setAlertMessage("ID de rutina no válido");
         router.back();
         return;
       }
@@ -106,7 +106,7 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
       const { routine: data, error } = await getSharedRoutineById(routineId);
 
       if (error || !data) {
-        Alert.alert("Error", "No se pudo cargar la rutina pública");
+        setAlertMessage("No se pudo cargar la rutina pública");
         router.back();
         return;
       }
@@ -138,10 +138,12 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
           routineId,
           userId,
         );
+
         setIsCloned(cloned);
       }
-    } catch {
-      Alert.alert("Error", "Ocurrió un error inesperado");
+    } catch (error) {
+      console.error(error);
+      setAlertMessage("Ocurrió un error inesperado");
       router.back();
     } finally {
       setLoading(false);
@@ -150,24 +152,33 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
 
   const handleClone = async () => {
     if (!routineId || !currentUserId) {
-      Alert.alert("Error", "Debes iniciar sesión para guardar esta rutina");
+      setAlertMessage("Debes iniciar sesión para guardar esta rutina");
       return;
     }
+
     try {
       setIsCloning(true);
+
       const { error } = await clonePublicRoutine(routineId, currentUserId);
+
       if (error) {
-        Alert.alert("Error", "No se pudo guardar la rutina.");
+        setAlertMessage("No se pudo guardar la rutina.");
         return;
       }
+
       setIsCloned(true);
       setShowSuccessAlert(true);
-    } catch {
-      Alert.alert("Error", "Ocurrió un error inesperado al guardar");
+    } catch (error) {
+      console.error(error);
+      setAlertMessage("Ocurrió un error inesperado al guardar");
     } finally {
       setIsCloning(false);
     }
   };
+
+  function clearAlert() {
+    setAlertMessage(null);
+  }
 
   return {
     routine,
@@ -177,5 +188,7 @@ export const useExploreDetailContainer = (routineId: string | undefined) => {
     handleClone,
     showSuccessAlert,
     setShowSuccessAlert,
+    alertMessage,
+    clearAlert,
   };
 };

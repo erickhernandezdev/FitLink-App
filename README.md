@@ -52,7 +52,7 @@ FitLink/
 
 ## Demo
 
-**Android APK** — Scan to download or [click here](https://expo.dev/accounts/erickhernandez18s-team/projects/fitlink-app/builds/1c2de330-1191-4356-895f-d72fc8a23b63)
+**Android APK** — Scan to download or [click here](https://expo.dev/accounts/erickhernandez18s-team/projects/fitlink-app/builds/93d87ab8-7691-4594-aa23-644c68b28aad)
 
 <div align="center">
   <img src="img/apkQR.jpg" width="200" alt="QR Code - Download APK">

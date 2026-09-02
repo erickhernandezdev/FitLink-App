@@ -1,9 +1,14 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'expo-router';
-import { Alert, Platform } from 'react-native';
-import { useRoutineForm } from '../hooks/useRoutineForm';
-import { getRoutineById, updateRoutine } from '../services/repositories/routineRepository';
-import { deleteRoutineExercises, insertRoutineExercises } from '../services/repositories/exerciseRepository';
+import { useState, useEffect } from "react";
+import { useRouter } from "expo-router";
+import { useRoutineForm } from "../hooks/useRoutineForm";
+import {
+  getRoutineById,
+  updateRoutine,
+} from "../services/repositories/routineRepository";
+import {
+  deleteRoutineExercises,
+  insertRoutineExercises,
+} from "../services/repositories/exerciseRepository";
 
 interface Exercise {
   exercise_id: number;
@@ -22,11 +27,17 @@ interface EditRoutineContainerProps {
   routineId: string;
 }
 
-export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps) {
+export function useEditRoutineContainer({
+  routineId,
+}: EditRoutineContainerProps) {
   const router = useRouter();
+
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [shouldBlockNavigation, setShouldBlockNavigation] = useState(true);
+
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const [initialData, setInitialData] = useState({
     name: '',
@@ -48,7 +59,7 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
       setIsLoading(true);
 
       if (!routineId) {
-        Alert.alert('Error', 'ID de rutina no válido');
+        setAlertMessage("ID de rutina no válido");
         router.back();
         return;
       }
@@ -56,7 +67,7 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
       const { routine, error } = await getRoutineById(routineId);
 
       if (error || !routine) {
-        Alert.alert('Error', 'No se pudo cargar la rutina');
+        setAlertMessage("No se pudo cargar la rutina");
         router.back();
         return;
       }
@@ -66,19 +77,20 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
         description: routine.description,
         estimatedTime: routine.estimated_time.toString(),
         isShared: routine.is_shared,
-        selectedExercises: (routine.routine_exercises as unknown as RawRoutineExercise[]).map(
-          (re) => re.exercises.exercise_id
-        ),
+        selectedExercises: (
+          routine.routine_exercises as unknown as RawRoutineExercise[]
+        ).map((re) => re.exercises.exercise_id),
         exerciseSets: Object.fromEntries(
-          (routine.routine_exercises as unknown as RawRoutineExercise[]).map((re) => [
-            re.exercises.exercise_id,
-            re.sets.toString(),
-          ])
+          (routine.routine_exercises as unknown as RawRoutineExercise[]).map(
+            (re) => [re.exercises.exercise_id, re.sets.toString()],
+          ),
         ),
       };
+
       setInitialData(loaded);
-    } catch {
-      Alert.alert('Error', 'Ocurrió un error inesperado');
+    } catch (error) {
+      console.error(error);
+      setAlertMessage("Ocurrió un error inesperado");
       router.back();
     } finally {
       setIsLoading(false);
@@ -89,7 +101,7 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
     if (!formState.validate()) return;
 
     if (!routineId) {
-      Alert.alert('Error', 'ID de rutina no válido');
+      setAlertMessage("ID de rutina no válido");
       return;
     }
 
@@ -118,28 +130,32 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
 
       const { error: insertError } = await insertRoutineExercises(
         Number(routineId),
-        exercises
+        exercises,
       );
 
       if (insertError) throw insertError;
 
-      if (Platform.OS === 'web') {
-        window.alert('Rutina actualizada exitosamente');
-      } else {
-        Alert.alert('Éxito', 'Rutina actualizada exitosamente');
-      }
-
       setShouldBlockNavigation(false);
-      router.back();
+      setShowSuccessAlert(true);
     } catch (error) {
+      console.error("Error al actualizar rutina:", error);
+      setAlertMessage("No se pudo actualizar la rutina");
+    } finally {
       setIsSaving(false);
-      console.error('Error al actualizar rutina:', error);
-      if (Platform.OS === 'web') {
-        window.alert('Error al actualizar la rutina');
-      } else {
-        Alert.alert('Error', 'No se pudo actualizar la rutina');
-      }
     }
+  }
+
+  function clearAlert() {
+    setAlertMessage(null);
+  }
+
+  function clearSuccessAlert() {
+    setShowSuccessAlert(false);
+  }
+
+  function handleSuccessAlertClose() {
+    setShowSuccessAlert(false);
+    router.back();
   }
 
   return {
@@ -148,5 +164,10 @@ export function useEditRoutineContainer({ routineId }: EditRoutineContainerProps
     isLoading,
     isSaving,
     shouldBlockNavigation,
+    alertMessage,
+    clearAlert,
+    showSuccessAlert,
+    clearSuccessAlert,
+    handleSuccessAlertClose,
   };
 }

@@ -132,6 +132,7 @@ export const TrainingHistory: React.FC<TrainingHistoryProps> = ({
             : `${item.type}-${item.value}-${index}`
         }
         renderItem={renderItem}
+        showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <Text style={styles.empty}>
             No tienes entrenamientos registrados.

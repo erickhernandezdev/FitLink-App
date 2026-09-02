@@ -1,11 +1,11 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRegisterContainer } from '../../containers/RegisterContainer';
-import { RegisterForm } from '../forms/RegisterForm';
-import { theme } from '../../constants/theme';
+import React from "react";
+import { View, StyleSheet } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { useRegisterContainer } from "../../containers/RegisterContainer";
+import { RegisterForm } from "../forms/RegisterForm";
+import { CustomAlert } from "../ui/CustomAlert";
+import { theme } from "../../constants/theme";
 
-// Conecta el container(manager que contiene la logica del login) con el form(componente visual)
 export const RegisterView: React.FC = () => {
   const {
     formData,
@@ -14,9 +14,10 @@ export const RegisterView: React.FC = () => {
     updateField,
     handleRegister,
     navigateToLogin,
+    alertMessage,
+    clearAlert,
   } = useRegisterContainer();
 
-  // El form solo recibe y renderiza props
   return (
     <SafeAreaView style={styles.safeArea}>
       <View style={styles.container}>
@@ -41,12 +42,25 @@ export const RegisterView: React.FC = () => {
           onRegister={handleRegister}
           onNavigateToLogin={navigateToLogin}
         />
+
+        <CustomAlert
+          visible={!!alertMessage}
+          title="Error"
+          message={alertMessage ?? ""}
+          type="error"
+          buttons={[
+            {
+              text: "OK",
+              variant: "primary",
+            },
+          ]}
+          onClose={clearAlert}
+        />
       </View>
     </SafeAreaView>
   );
 };
 
-// Estilos para el view
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.background,
@@ -54,6 +68,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
+
   safeArea: {
     backgroundColor: theme.colors.background,
     flex: 1,

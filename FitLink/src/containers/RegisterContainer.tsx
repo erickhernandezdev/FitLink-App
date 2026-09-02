@@ -1,7 +1,6 @@
-import { useState } from 'react';
-import { useRouter } from 'expo-router';
-import { Alert, Platform } from 'react-native';
-import { registerUser } from '../services/authService';
+import { useState } from "react";
+import { useRouter } from "expo-router";
+import { registerUser } from "../services/authService";
 
 interface RegisterFormData {
   fullName: string;
@@ -19,20 +18,24 @@ interface RegisterFormErrors {
 
 export const useRegisterContainer = () => {
   const router = useRouter();
+
   const [formData, setFormData] = useState<RegisterFormData>({
     fullName: '',
     email: '',
     username: '',
     password: '',
   });
+
   const [errors, setErrors] = useState<RegisterFormErrors>({});
   const [loading, setLoading] = useState(false);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
 
   const updateField = (field: keyof RegisterFormData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
+
     // Clear error when user starts typing
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
+      setErrors((prev) => ({ ...prev, [field]: undefined }));
     }
   };
 
@@ -40,26 +43,27 @@ export const useRegisterContainer = () => {
     const newErrors: RegisterFormErrors = {};
 
     if (!formData.fullName.trim()) {
-      newErrors.fullName = 'El nombre completo es obligatorio';
+      newErrors.fullName = "El nombre completo es obligatorio";
     }
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'El correo electrónico es obligatorio';
+      newErrors.email = "El correo electrónico es obligatorio";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      newErrors.email = 'El formato del correo electrónico no es válido';
+      newErrors.email = "El formato del correo electrónico no es válido";
     }
-    
+
     if (!formData.username.trim()) {
-      newErrors.username = 'El nombre de usuario es obligatorio';
+      newErrors.username = "El nombre de usuario es obligatorio";
     }
-    
+
     if (!formData.password.trim()) {
-      newErrors.password = 'La contraseña es obligatoria';
+      newErrors.password = "La contraseña es obligatoria";
     } else if (formData.password.length < 6) {
-      newErrors.password = 'La contraseña debe tener al menos 6 caracteres';
+      newErrors.password = "La contraseña debe tener al menos 6 caracteres";
     }
 
     setErrors(newErrors);
+
     return Object.keys(newErrors).length === 0;
   };
 
@@ -68,29 +72,34 @@ export const useRegisterContainer = () => {
 
     try {
       setLoading(true);
+
       await registerUser(
         formData.email,
         formData.password,
         formData.username,
-        formData.fullName
+        formData.fullName,
       );
-      router.replace('/login');
+
+      router.replace("/login");
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Error desconocido';
-      console.error('Error en registro:', message);
-      
-      if (Platform.OS === 'web') {
-        window.alert('No se pudo completar el registro. Por favor verifica tus datos e intenta nuevamente.');
-      } else {
-        Alert.alert('Error', 'No se pudo completar el registro. Por favor verifica tus datos e intenta nuevamente.');
-      }
+      const message = err instanceof Error ? err.message : "Error desconocido";
+
+      console.error("Error en registro:", message);
+
+      setAlertMessage(
+        "No se pudo completar el registro. Por favor verifica tus datos e intenta nuevamente.",
+      );
     } finally {
       setLoading(false);
     }
   };
 
   const navigateToLogin = () => {
-    router.push('/login');
+    router.push("/login");
+  };
+
+  const clearAlert = () => {
+    setAlertMessage(null);
   };
 
   return {
@@ -100,5 +109,7 @@ export const useRegisterContainer = () => {
     updateField,
     handleRegister,
     navigateToLogin,
+    alertMessage,
+    clearAlert,
   };
 };

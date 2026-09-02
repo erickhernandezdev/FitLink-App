@@ -18,6 +18,7 @@ interface RoutinesListProps {
   recommendedRoutine: Routine | null;
   loading: boolean;
   searchQuery: string;
+  allRoutinesCount: number;
   onSearchChange: (query: string) => void;
   onRoutinePress: (routineId: number) => void;
   onAddRoutine: () => void;
@@ -30,6 +31,7 @@ export const RoutinesList: React.FC<RoutinesListProps> = ({
   recommendedRoutine,
   loading,
   searchQuery,
+  allRoutinesCount,
   onSearchChange,
   onRoutinePress,
   onAddRoutine,
@@ -39,37 +41,7 @@ export const RoutinesList: React.FC<RoutinesListProps> = ({
   if (loading) {
     return (
       <View style={styles.center}>
-        <ActivityIndicator
-          size="large"
-          color={theme.colors.primary}
-        />
-      </View>
-    );
-  }
-
-  if (routines.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyTitle}>
-          No tienes rutinas guardadas
-        </Text>
-
-        <Text style={styles.emptyText}>
-          Explora las rutinas disponibles o crea una nueva para comenzar.
-        </Text>
-
-        <View style={styles.emptyButtons}>
-          <Button
-            title="Explorar rutinas"
-            onPress={onExplore}
-          />
-
-          <Button
-            title="Crear rutina"
-            onPress={onAddRoutine}
-            variant="secondary"
-          />
-        </View>
+        <ActivityIndicator size="large" color={theme.colors.primary} />
       </View>
     );
   }
@@ -95,9 +67,7 @@ export const RoutinesList: React.FC<RoutinesListProps> = ({
           <>
             {recommendedRoutine && (
               <>
-                <Text style={styles.sectionTitle}>
-                  Rutina del día
-                </Text>
+                <Text style={styles.sectionTitle}>Rutina del día</Text>
 
                 <RoutineCard
                   name={recommendedRoutine.name}
@@ -105,25 +75,16 @@ export const RoutinesList: React.FC<RoutinesListProps> = ({
                     recommendedRoutine.routine_exercises?.length ?? 0
                   }
                   estimatedTime={recommendedRoutine.estimated_time}
-                  onPress={() =>
-                    onRoutinePress(recommendedRoutine.routine_id)
-                  }
-                  onStart={() =>
-                    onQuickStart(recommendedRoutine.routine_id)
-                  }
+                  onPress={() => onRoutinePress(recommendedRoutine.routine_id)}
+                  onStart={() => onQuickStart(recommendedRoutine.routine_id)}
                 />
               </>
             )}
 
             <View style={styles.titleRow}>
-              <Text style={styles.titleRowText}>
-                Tus rutinas
-              </Text>
+              <Text style={styles.titleRowText}>Tus rutinas</Text>
 
-              <TouchableOpacity
-                onPress={onAddRoutine}
-                style={styles.addButton}
-              >
+              <TouchableOpacity onPress={onAddRoutine} style={styles.addButton}>
                 <FontAwesome
                   name="plus"
                   size={18}
@@ -138,6 +99,33 @@ export const RoutinesList: React.FC<RoutinesListProps> = ({
               onChangeText={onSearchChange}
             />
           </>
+        }
+        ListEmptyComponent={
+          allRoutinesCount === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyTitle}>No tienes rutinas guardadas</Text>
+
+              <Text style={styles.emptyText}>
+                Explora las rutinas disponibles o crea una nueva para comenzar.
+              </Text>
+
+              <View style={styles.emptyButtons}>
+                <Button title="Explorar rutinas" onPress={onExplore} />
+
+                <Button
+                  title="Crear rutina"
+                  onPress={onAddRoutine}
+                  variant="secondary"
+                />
+              </View>
+            </View>
+          ) : (
+            <View style={styles.searchEmptyContainer}>
+              <Text style={styles.searchEmptyText}>
+                No se encontraron resultados.
+              </Text>
+            </View>
+          )
         }
       />
     </View>
@@ -218,5 +206,17 @@ const styles = StyleSheet.create({
   emptyButtons: {
     maxWidth: 320,
     width: "100%",
+  },
+
+  searchEmptyContainer: {
+    alignItems: "center",
+    padding: 30,
+  },
+
+  searchEmptyText: {
+    color: theme.colors.textSecondary,
+    fontFamily: "Roboto_400Regular",
+    fontSize: 15,
+    textAlign: "center",
   },
 });

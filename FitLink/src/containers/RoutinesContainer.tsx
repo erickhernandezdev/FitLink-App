@@ -24,22 +24,23 @@ export const useRoutinesContainer = () => {
   const router = useRouter();
 
   const [routines, setRoutines] = useState<Routine[]>([]);
-  const [recommendedRoutine, setRecommendedRoutine] =
-    useState<Routine | null>(null);
+  const [recommendedRoutine, setRecommendedRoutine] = useState<Routine | null>(
+    null,
+  );
 
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
 
   // Filtrado de rutinas
   const filteredRoutines = routines.filter((routine) =>
-    routine.name.toLowerCase().includes(searchQuery.toLowerCase())
+    routine.name.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Cargar rutinas cuando la pantalla está en foco
   useFocusEffect(
     useCallback(() => {
       loadRoutines();
-    }, [])
+    }, []),
   );
 
   // Cargar rutinas del usuario actual
@@ -69,7 +70,7 @@ export const useRoutinesContainer = () => {
       }
 
       const { routines: data, error } = await getRoutinesByUserId(
-        users.user_id
+        users.user_id,
       );
 
       if (error) {
@@ -83,10 +84,8 @@ export const useRoutinesContainer = () => {
       setRoutines(loadedRoutines);
 
       // Obtener historial de entrenamientos
-      const {
-        sessions,
-        error: sessionsError,
-      } = await getTrainingSessionsByUserId(users.user_id);
+      const { sessions, error: sessionsError } =
+        await getTrainingSessionsByUserId(users.user_id);
 
       if (sessionsError) {
         console.error(sessionsError);
@@ -101,7 +100,7 @@ export const useRoutinesContainer = () => {
         if (!lastTrainingByRoutine.has(session.routine_id)) {
           lastTrainingByRoutine.set(
             session.routine_id,
-            `${session.date}T${session.time || "00:00:00"}`
+            `${session.date}T${session.time || "00:00:00"}`,
           );
         }
       });
@@ -114,11 +113,11 @@ export const useRoutinesContainer = () => {
           }
 
           const routineLastTraining = lastTrainingByRoutine.get(
-            routine.routine_id
+            routine.routine_id,
           );
 
           const recommendedLastTraining = lastTrainingByRoutine.get(
-            recommended.routine_id
+            recommended.routine_id,
           );
 
           // Priorizar rutinas que nunca se han entrenado
@@ -157,7 +156,7 @@ export const useRoutinesContainer = () => {
 
           return recommended;
         },
-        null
+        null,
       );
 
       setRecommendedRoutine(recommendation);
@@ -188,6 +187,7 @@ export const useRoutinesContainer = () => {
 
   return {
     routines: filteredRoutines,
+    allRoutinesCount: routines.length,
     recommendedRoutine,
     loading,
     searchQuery,

@@ -9,11 +9,9 @@ import { theme } from "../../constants/theme";
 
 export default function AddRoutineView() {
   const navigation = useNavigation();
-
   const container = useAddRoutineContainer();
 
   const [showUnsavedChangesAlert, setShowUnsavedChangesAlert] = useState(false);
-
   const [pendingNavigationAction, setPendingNavigationAction] =
     useState<any>(null);
 
@@ -62,6 +60,20 @@ export default function AddRoutineView() {
           setShowUnsavedChangesAlert(false);
           setPendingNavigationAction(null);
         }}
+      />
+
+      <CustomAlert
+        visible={!!container.alertMessage}
+        title="Error"
+        message={container.alertMessage ?? ""}
+        type="error"
+        buttons={[
+          {
+            text: "OK",
+            variant: "primary",
+          },
+        ]}
+        onClose={container.clearAlert}
       />
     </>
   );
